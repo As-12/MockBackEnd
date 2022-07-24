@@ -4,29 +4,35 @@ from flask import Flask, request, jsonify
 
 app = Flask(__name__)
 
-mock_data = {}
+mock_data = []
 
 def new_employee(id: int):
-    result = {"name": "Mr " + id, "id": id}
+    result = {"name": "Mr " + str(id), "id": id}
     return result
 
 def populate_mock_data():
     for i in range(25):
         mock_data.append({})
-        mock_data[i]["employee_data"] = [new_employee(i) for i in range(25)]
-        mock_data["page_size"] = 25
-        mock_data["page"] = i + 1
-        mock_data["page_count"] = 25
-        mock_data["employee_count"] = 25 * 25
+        mock_data[i]["employee_data"] = [new_employee(random.randint(0, 1000)) for i in range(25)]
+        mock_data[i]["page_size"] = 25
+        mock_data[i]["page"] = i + 1
+        mock_data[i]["page_count"] = 25
+        mock_data[i]["employee_count"] = 25 * 25
 
 @app.route('/')
 def default():
     return '', 204
 
-@app.route('/employee')
+@app.route('/employees')
 def list_employee_page():
-    return '', 204
+    index: int = int(request.args.get("page"))
+    if index <= 0 or index > 25:
+        return '', 204
+    else:
+        return mock_data[index - 1]
+
 
 if __name__ == '__main__':
     populate_mock_data()
     app.run()
+
